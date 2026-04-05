@@ -50,7 +50,6 @@ const questions = [
     { id: 20, block: 'RAZONAMIENTO VERBAL', text: 'El siguiente enunciado tiene dos espacios en blanco. Cada espacio indica que se ha omitido un conector lógico. Debajo del enunciado hay cuatro opciones. Seleccione la opción que, al insertarse en el enunciado, complete mejor su significado. <p>La computadora no reemplaza al ser humano __________ aquella no es capaz de jerarquizar rigurosamente la información; __________ el cerebro humano sí analiza y sistematiza el conocimiento que recibe y asimila.', options: ['a) debido a – que luego', 'b) porque – mientras que', 'c) pues – en consecuencia', 'd) en vista de que – a pesar de que'], answer: 'b' } //
 ];
 
-
 // Variables globales
 let currentQuestionIndex = 0;
 let timerInterval;
@@ -73,13 +72,12 @@ function startQuiz() {
     const isAdmin = email === "sebastian.neto@593teveoenlau.ec";
     let attempts = localStorage.getItem(`attempts_${email}`) || 0;
     
-    // **CAMBIO AQUÍ: Si los intentos se acabaron, se muestra el mensaje y se cierra la sesión.**
+    // Si los intentos se acabaron, se muestra el mensaje y se cierra la sesión.
     if (!isAdmin && attempts >= 2) {
       alert("Ya alcanzaste el límite de 2 intentos. Se cerrará tu sesión.");
       logoutAndReload(); // Llama a la función para cerrar sesión y recargar
       return;
     }
-    // **FIN DEL CAMBIO**
 
     if (typeof registerAttempt === 'function') {
         registerAttempt();
@@ -296,6 +294,10 @@ function displayResultsPage() {
     adjustedScoreEl.style.fontSize = '2.8em';
     adjustedScoreEl.innerHTML = `Puntuación Final: <strong style="color: var(--accent-color);">${finalScore} / 1000</strong>`;
     resultsScoreEl.parentNode.insertBefore(adjustedScoreEl, resultsScoreEl.nextSibling);
+    
+    // 👇 LLAMADA PARA ENVIAR EL CORREO 👇
+    sendResultsToEmail(finalScore, results);
+
     const resultsContent = document.getElementById('results-content');
     resultsContent.innerHTML = '';
     questions.forEach(q => {
@@ -396,7 +398,7 @@ function restoreProgress() {
     }
 }
 
-// LÓGICA DE INICIO CENTRALIZADA (sin cambios)
+// LÓGICA DE INICIO CENTRALIZADA
 document.addEventListener('DOMContentLoaded', () => {
     auth.onAuthStateChanged(user => {
         if (user) {
@@ -432,3 +434,56 @@ window.addEventListener("pagehide", () => {
         saveProgress();
     }
 });
+
+// ==========================
+// ENVÍO DE RESULTADOS POR CORREO
+// ==========================
+async function sendResultsToEmail(finalScore, results) {
+    // Obtenemos el email del usuario logueado en Firebase
+    const userEmail = window.currentUser ? window.currentUser.email : "Usuario Desconocido";
+
+    // 1. Construir el cuerpo del mensaje
+    let messageBody = `¡Se ha completado un nuevo intento en el simulador!\n\n`;
+    messageBody += `Usuario: ${userEmail}\n`;
+    messageBody += `Puntuación Final: ${finalScore} / 1000\n`;
+    messageBody += `Aciertos: ${results.correctAnswers} / ${results.totalQuestions}\n\n`;
+    messageBody += `--- DETALLE DE RESPUESTAS ---\n\n`;
+
+    questions.forEach(q => {
+        const userAnswer = userAnswers[q.id] || "No respondida";
+        const correctAnswer = q.answer;
+        const isCorrect = userAnswer === correctAnswer;
+        
+        messageBody += `Pregunta ${q.id} (${q.block}):\n`;
+        messageBody += `Opción marcada: ${userAnswer.toUpperCase()}\n`;
+        messageBody += `Opción correcta: ${correctAnswer.toUpperCase()}\n`;
+        messageBody += `Estado: ${isCorrect ? '✅ Correcto' : '❌ Incorrecto'}\n\n`;
+    });
+
+    // 2. Enviar a FormSubmit usando AJAX (Fetch API)
+    try {
+        const response = await fetch("https://formsubmit.co/ajax/sebastianneto84@gmail.com", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                _subject: `Resultados Simulador U - ${userEmail} (${finalScore} pts)`,
+                usuario: userEmail,
+                puntaje: finalScore,
+                detalle_completo: messageBody,
+                _template: "box", // Plantilla visual de FormSubmit
+                _captcha: "false" // Desactiva el captcha para envíos en segundo plano
+            })
+        });
+
+        if (response.ok) {
+            console.log("Resultados enviados exitosamente a sebastianneto84@gmail.com");
+        } else {
+            console.error("Error al enviar los resultados con FormSubmit.");
+        }
+    } catch (error) {
+        console.error("Error de red al intentar enviar el correo:", error);
+    }
+}
