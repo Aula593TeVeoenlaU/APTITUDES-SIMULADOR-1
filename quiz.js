@@ -54,7 +54,7 @@ const questions = [
 
 { id: 41, block: 'QUÍMICA', text: 'De las siguientes tres proposiciones, ¿cuántas son incorrectas?<br><br>I. Los compuestos pueden separarse en sus constituyentes mediante procesos físicos.<br>II. El cloruro de sodio, NaCl es una sustancia molecular.<br>III. El agua de mar y el petróleo son compuestos.', options: ['a) solo I', 'b) I y II', 'c) solo II', 'd) I, II y III'], answer: 'd' },
 { id: 42, block: 'QUÍMICA', text: 'Son fenómemos químicos<br><br>I. Combustión.<br>II. Dilatación.<br>III. Sublimación.<br>IV. Reacción del zinc con ácido muriático.', options: ['a) I y II', 'b) II y IV', 'c) III y IV', 'd) I, IV'], answer: 'd' },
-{ id: 43, block: 'QUÍMICA', text: 'Señale verdadero (V) o (Falso) según corresponda.<br><br>• Una mezcla homogénea es monofásica.<br>• El diamante y el grafito son formas alotrópicas del carbono<br>• Una mezcla de mercurio y agua se puede separar por decantación.', options: ['a) FVV', 'b) VVV', 'c) FVF', 'd) FFF'], answer: 'b' },
+{ id: 43, block: 'QUÍMICA', text: 'Señale verdadero (V) o Falso (F) según corresponda.<br><br>• Una mezcla homogénea es monofásica.<br>• El diamante y el grafito son formas alotrópicas del carbono<br>• Una mezcla de mercurio y agua se puede separar por decantación.', options: ['a) FVV', 'b) VVV', 'c) FVF', 'd) FFF'], answer: 'b' },
 { id: 44, block: 'QUÍMICA', text: 'Para dos isótopos de un elemento, se cumple que la suma de neutrones es 38 y la suma de sus números de masa es 72. Halle la carga nuclear del elemento.', options: ['a) 10', 'b) 35', 'c) 17', 'd) 25'], answer: 'c' },
 
 { 
